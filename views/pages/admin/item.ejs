@@ -1,23 +1,27 @@
-<%- include('components/header.ejs') %>
+<%- include('../../components/header.ejs') %>
 
   <!-- Page Wrapper -->
   <div id="wrapper">
-    <%- include('components/sidebar.ejs') %>
+    <%- include('../../components/sidebar.ejs') %>
     <div id="content-wrapper" class="d-flex flex-column">
       <div id="content">
-        <%- include('components/navbar.ejs') %>
+        <%- include('../../components/navbar.ejs') %>
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
 
           <!-- Page Heading -->
-          <h1 class="h3 mb-4 text-gray-800">Blank Page</h1>
+          <h1 class="h3 mb-4 text-gray-800">Item</h1>
+          <!-- End of Page Heading -->
+
+          <!-- DataTables -->
+          <%- include('../../components/item-table.ejs') %>
 
         </div>
         <!-- /.container-fluid -->
 
       </div>
-      <%- include('components/footer.ejs') %>
+      <%- include('../../components/footer.ejs') %>
     </div>
   </div>
   <!-- End of Page Wrapper -->
@@ -46,4 +50,4 @@
     </div>
   </div>
 
-<%- include('components/script.ejs') %>
+<%- include('../../components/script.ejs') %>
