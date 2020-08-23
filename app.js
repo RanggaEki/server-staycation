@@ -5,13 +5,16 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 // import mongoose
 import mongoose from 'mongoose';
+import methodOverride from 'method-override';
+import session from 'express-session';
+import flash from 'connect-flash';
 
 import indexRouter from './routes/index';
 import usersRouter from './routes/users';
 // routes admin
 import adminRouter from './routes/admin';
 
-const URI = 'mongodb://localhost:27017/myapp';
+const URI = 'mongodb://localhost:27017/db_staycation';
 const OPTIONS = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -25,6 +28,14 @@ const app = express();
 // view engine setup
 app.set('views', join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.use(methodOverride('_method'));
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { maxAge: 60000 },
+}));
+app.use(flash());
 
 app.use(logger('dev'));
 app.use(json());

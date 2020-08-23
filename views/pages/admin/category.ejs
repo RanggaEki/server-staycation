@@ -9,16 +9,18 @@
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
+          <%- include('../../components/message.ejs') %>
 
           <!-- Page Heading -->
           <h1 class="h3 mb-4 text-gray-800">Category</h1>
           <!-- End of Page Heading -->
 
           <!-- DataTables -->
-          <%- include('../../components/category-table.ejs') %>
+          <%- include('../../components/admin/category-table.ejs') %>
 
         </div>
         <!-- /.container-fluid -->
+        
 
       </div>
       <%- include('../../components/footer.ejs') %>
@@ -50,4 +52,16 @@
     </div>
   </div>
 
+<%- include('../../components/admin/category-add-modal.ejs') %>
+<%- include('../../components/admin/category-edit-modal.ejs') %>
 <%- include('../../components/script.ejs') %>
+
+<script>
+  $('#dataTable').on('click','.button-update', function(){
+    let id = $(this).data('id');
+    let name = $(this).data('name');
+    $('#edit-modal').modal('show');
+    $('.id').val(id);
+    $('.name').val(name);
+  })
+</script>
