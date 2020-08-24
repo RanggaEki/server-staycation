@@ -19,7 +19,9 @@ const AdminController = {
         title: 'Staycation | Category',
       });
     } catch (error) {
-      res.render('pages/admin/category');
+      req.flash('alertMessage', `${error.message}`);
+      req.flash('alertStatus', 'danger');
+      res.redirect('pages/admin/category');
     }
   },
 
@@ -31,7 +33,7 @@ const AdminController = {
       req.flash('alertStatus', 'success');
       res.redirect('/admin/category');
     } catch (error) {
-      req.flash('alertMessage', '$error.message');
+      req.flash('alertMessage', `${error.message}`);
       req.flash('alertStatus', 'danger');
       res.redirect('/admin/category');
     }
@@ -47,7 +49,7 @@ const AdminController = {
       req.flash('alertStatus', 'success');
       res.redirect('/admin/category');
     } catch (error) {
-      req.flash('alertMessage', '$error.message');
+      req.flash('alertMessage', `${error.message}`);
       req.flash('alertStatus', 'danger');
       res.redirect('/admin/category');
     }
@@ -62,16 +64,40 @@ const AdminController = {
       req.flash('alertStatus', 'success');
       res.redirect('/admin/category');
     } catch (error) {
-      req.flash('alertMessage', '$error.message');
+      req.flash('alertMessage', `${error.message}`);
       req.flash('alertStatus', 'danger');
       res.redirect('/admin/category');
     }
   },
 
   viewBank(req, res) {
-    res.render('pages/admin/bank', {
-      title: 'Staycation | Bank',
-    });
+    try {
+      const alertMessage = req.flash('alertMessage');
+      const alertStatus = req.flash('alertStatus');
+      const alert = { message: alertMessage, status: alertStatus };
+      res.render('pages/admin/bank', {
+        title: 'Staycation | Bank',
+        alert,
+      });
+    } catch (error) {
+      req.flash('alertMessage', `${error.message}`);
+      req.flash('alertStatus', 'danger');
+      res.redirect('/admin/bank');
+    }
+  },
+
+  async addBank(req, res) {
+    try {
+      const { name } = req.body;
+      await Category.create({ name });
+      req.flash('alertMessage', 'Success add category');
+      req.flash('alertStatus', 'success');
+      res.redirect('/admin/category');
+    } catch (error) {
+      req.flash('alertMessage', `${error.message}`);
+      req.flash('alertStatus', 'danger');
+      res.redirect('/admin/category');
+    }
   },
 
   viewItem(req, res) {

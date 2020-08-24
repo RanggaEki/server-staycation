@@ -14,4 +14,4 @@ router.get('/bank', AdminController.viewBank);
 router.get('/item', AdminController.viewItem);
 router.get('/booking', AdminController.viewBooking);
 
-module.exports = router;
+export default router;
