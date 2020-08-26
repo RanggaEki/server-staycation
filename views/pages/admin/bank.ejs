@@ -9,6 +9,7 @@
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
+          <%- include('../../components/message.ejs') %>
 
           <!-- Page Heading -->
           <h1 class="h3 mb-4 text-gray-800">Bank</h1>
@@ -51,4 +52,19 @@
   </div>
 
 <%- include('../../components/admin/bank-add-modal.ejs') %>
+<%- include('../../components/admin/bank-edit-modal.ejs') %>
 <%- include('../../components/script.ejs') %>
+
+<script>
+  $('#dataTable').on('click','.button-update', function(){
+    let id = $(this).data('id');
+    let bankName = $(this).data('bankname');
+    let accountNumber = $(this).data('accountnumber');
+    let name = $(this).data('name');
+    $('#edit-modal').modal('show');
+    $('.id').val(id);
+    $('.bankName').val(bankName);
+    $('.accountNumber').val(accountNumber);
+    $('.name').val(name);
+  })
+</script>

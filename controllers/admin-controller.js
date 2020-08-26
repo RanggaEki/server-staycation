@@ -1,4 +1,21 @@
+/* eslint-disable no-undef */
+import fs from 'fs-extra';
+import path from 'path';
 import Category from '../models/category-schema';
+import Bank from '../models/bank-schema';
+
+const generateSuccessMessage = (req, res, endpoint, model) => {
+  const message = `Success ${endpoint} ${model}`;
+  req.flash('alertMessage', message);
+  req.flash('alertStatus', 'success');
+  res.redirect(`/admin/${model}`);
+};
+
+const generateErrorMessage = (req, res, error, model) => {
+  req.flash('alertMessage', `${error.message}`);
+  req.flash('alertStatus', 'danger');
+  res.redirect(`/admin/${model}`);
+};
 
 const AdminController = {
   viewDashboard(req, res) {
@@ -19,9 +36,7 @@ const AdminController = {
         title: 'Staycation | Category',
       });
     } catch (error) {
-      req.flash('alertMessage', `${error.message}`);
-      req.flash('alertStatus', 'danger');
-      res.redirect('pages/admin/category');
+      generateErrorMessage(req, res, error, 'category');
     }
   },
 
@@ -29,13 +44,9 @@ const AdminController = {
     try {
       const { name } = req.body;
       await Category.create({ name });
-      req.flash('alertMessage', 'Success add category');
-      req.flash('alertStatus', 'success');
-      res.redirect('/admin/category');
+      generateSuccessMessage(req, res, 'add', 'category');
     } catch (error) {
-      req.flash('alertMessage', `${error.message}`);
-      req.flash('alertStatus', 'danger');
-      res.redirect('/admin/category');
+      generateErrorMessage(req, res, error, 'category');
     }
   },
 
@@ -45,13 +56,9 @@ const AdminController = {
       const category = await Category.findOne({ _id: id });
       category.name = name;
       await category.save();
-      req.flash('alertMessage', 'Success update category');
-      req.flash('alertStatus', 'success');
-      res.redirect('/admin/category');
+      generateSuccessMessage(req, res, 'update', 'category');
     } catch (error) {
-      req.flash('alertMessage', `${error.message}`);
-      req.flash('alertStatus', 'danger');
-      res.redirect('/admin/category');
+      generateErrorMessage(req, res, error, 'category');
     }
   },
 
@@ -60,43 +67,75 @@ const AdminController = {
       const { id } = req.params;
       const category = await Category.findOne({ _id: id });
       await category.remove();
-      req.flash('alertMessage', 'Success delete category');
-      req.flash('alertStatus', 'success');
-      res.redirect('/admin/category');
+      generateSuccessMessage(req, res, 'delete', 'category');
     } catch (error) {
-      req.flash('alertMessage', `${error.message}`);
-      req.flash('alertStatus', 'danger');
-      res.redirect('/admin/category');
+      generateErrorMessage(req, res, error, 'category');
     }
   },
 
-  viewBank(req, res) {
+  async viewBank(req, res) {
     try {
+      const bank = await Bank.find();
       const alertMessage = req.flash('alertMessage');
       const alertStatus = req.flash('alertStatus');
       const alert = { message: alertMessage, status: alertStatus };
       res.render('pages/admin/bank', {
         title: 'Staycation | Bank',
         alert,
+        bank,
       });
     } catch (error) {
-      req.flash('alertMessage', `${error.message}`);
-      req.flash('alertStatus', 'danger');
-      res.redirect('/admin/bank');
+      generateErrorMessage(req, res, error, 'bank');
     }
   },
 
   async addBank(req, res) {
     try {
-      const { name } = req.body;
-      await Category.create({ name });
-      req.flash('alertMessage', 'Success add category');
-      req.flash('alertStatus', 'success');
-      res.redirect('/admin/category');
+      const {
+        bankName, accountNumber, name,
+      } = req.body;
+      console.log(req.body);
+      await Bank.create({
+        bankName,
+        accountNumber,
+        name,
+        imageUrl: `images/${req.file.filename}`,
+      });
+      generateSuccessMessage(req, res, 'add', 'bank');
     } catch (error) {
-      req.flash('alertMessage', `${error.message}`);
-      req.flash('alertStatus', 'danger');
-      res.redirect('/admin/category');
+      generateErrorMessage(req, res, error, 'bank');
+    }
+  },
+
+  async editBank(req, res) {
+    try {
+      const {
+        id, bankName, accountNumber, name,
+      } = req.body;
+      const bank = await Bank.findOne({ _id: id });
+      bank.bankName = bankName;
+      bank.accountNumber = accountNumber;
+      bank.name = name;
+      if (req.file !== undefined) {
+        await fs.unlink(path.join(`public/${bank.imageUrl}`));
+        bank.imageUrl = `images/${req.file.filename}`;
+      }
+      await bank.save();
+      generateSuccessMessage(req, res, 'update', 'bank');
+    } catch (error) {
+      generateErrorMessage(req, res, error, 'bank');
+    }
+  },
+
+  async deleteBank(req, res) {
+    try {
+      const { id } = req.params;
+      const bank = await Bank.findOne({ _id: id });
+      await fs.unlink(path.join(`public/${bank.imageUrl}`));
+      await bank.remove();
+      generateSuccessMessage(req, res, 'delete', 'bank');
+    } catch (error) {
+      generateErrorMessage(req, res, error, 'bank');
     }
   },
 
