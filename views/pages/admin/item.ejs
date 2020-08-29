@@ -9,13 +9,52 @@
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
+          <%- include('../../components/message.ejs') %>
 
           <!-- Page Heading -->
           <h1 class="h3 mb-4 text-gray-800">Item</h1>
           <!-- End of Page Heading -->
 
-          <!-- DataTables -->
-          <%- include('../../components/admin/item-table.ejs') %>
+          <% if(action == 'view') { %>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link active" id="show-tab" data-toggle="tab" href="#show-item" role="tab" aria-controls="show" aria-selected="true">
+                  Show Item
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" id="add-tab" data-toggle="tab" href="#add-item" role="tab" aria-controls="add" aria-selected="false">
+                  Add Item
+                </a>
+              </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+              <%- include('../../components/admin/item-table.ejs') %>
+              <%- include('../../components/admin/item-add-form.ejs') %>
+            </div>
+          <% } else if(action == 'show image') { %>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link active" id="image-tab" data-toggle="tab" href="#show-image" role="tab" aria-controls="image" aria-selected="true">
+                  Show Image
+                </a>
+              </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+              <%- include('../../components/admin/item-show-image.ejs') %>
+            </div>
+          <% } else { %>
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link active" id="edit-tab" data-toggle="tab" href="#edit-item" role="tab" aria-controls="edit" aria-selected="true">
+                  Edit Item
+                </a>
+              </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+              <%- include('../../components/admin/item-edit-form.ejs') %>
+            </div>
+          <% } %>
 
         </div>
         <!-- /.container-fluid -->
@@ -51,3 +90,6 @@
   </div>
 
 <%- include('../../components/script.ejs') %>
+<script>
+  CKEDITOR.replace('about');
+</script>

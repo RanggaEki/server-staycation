@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, ObjectId } from 'mongoose';
 
 const FeatureSchema = new Schema({
   name: {
@@ -12,6 +12,10 @@ const FeatureSchema = new Schema({
   imageUrl: {
     type: String,
     required: true,
+  },
+  itemId: {
+    type: ObjectId,
+    ref: 'Item',
   },
 });
 

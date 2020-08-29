@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, ObjectId } from 'mongoose';
 
 const ActivitySchema = new Schema({
   name: {
@@ -15,6 +15,10 @@ const ActivitySchema = new Schema({
   },
   isPopular: {
     type: Boolean,
+  },
+  itemId: {
+    type: ObjectId,
+    ref: 'Item',
   },
 });
 

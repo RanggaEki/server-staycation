@@ -1,8 +1,14 @@
+/* eslint-disable no-shadow */
+/* eslint-disable no-plusplus */
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable no-undef */
 import fs from 'fs-extra';
 import path from 'path';
 import Category from '../models/category-schema';
 import Bank from '../models/bank-schema';
+import Item from '../models/item-schema';
+import Image from '../models/image-schema';
 
 const generateSuccessMessage = (req, res, endpoint, model) => {
   const message = `Success ${endpoint} ${model}`;
@@ -17,6 +23,11 @@ const generateErrorMessage = (req, res, error, model) => {
   res.redirect(`/admin/${model}`);
 };
 
+const setAlert = (req) => ({
+  message: req.flash('alertMessage'),
+  status: req.flash('alertStatus'),
+});
+
 const AdminController = {
   viewDashboard(req, res) {
     res.render('pages/admin/dashboard', {
@@ -27,13 +38,11 @@ const AdminController = {
   async viewCategory(req, res) {
     try {
       const category = await Category.find();
-      const alertMessage = req.flash('alertMessage');
-      const alertStatus = req.flash('alertStatus');
-      const alert = { message: alertMessage, status: alertStatus };
+      const alert = setAlert(req);
       res.render('pages/admin/category', {
+        title: 'Staycation | Category',
         category,
         alert,
-        title: 'Staycation | Category',
       });
     } catch (error) {
       generateErrorMessage(req, res, error, 'category');
@@ -76,13 +85,11 @@ const AdminController = {
   async viewBank(req, res) {
     try {
       const bank = await Bank.find();
-      const alertMessage = req.flash('alertMessage');
-      const alertStatus = req.flash('alertStatus');
-      const alert = { message: alertMessage, status: alertStatus };
+      const alert = setAlert(req);
       res.render('pages/admin/bank', {
         title: 'Staycation | Bank',
-        alert,
         bank,
+        alert,
       });
     } catch (error) {
       generateErrorMessage(req, res, error, 'bank');
@@ -94,7 +101,6 @@ const AdminController = {
       const {
         bankName, accountNumber, name,
       } = req.body;
-      console.log(req.body);
       await Bank.create({
         bankName,
         accountNumber,
@@ -139,10 +145,137 @@ const AdminController = {
     }
   },
 
-  viewItem(req, res) {
-    res.render('pages/admin/item', {
-      title: 'Staycation | Item',
-    });
+  async viewItem(req, res) {
+    try {
+      const item = await Item.find()
+        .populate({ path: 'imageId', select: 'id imageUrl' })
+        .populate({ path: 'categoryId', select: 'id name' });
+      const category = await Category.find();
+      const alert = setAlert(req);
+      res.render('pages/admin/item', {
+        title: 'Staycation | Item',
+        item,
+        category,
+        alert,
+        action: 'view',
+      });
+    } catch (error) {
+      generateErrorMessage(req, res, error, 'item');
+    }
+  },
+
+  async addItem(req, res) {
+    try {
+      const {
+        title, price, city, categoryId, about,
+      } = req.body;
+      if (req.files.length > 0) {
+        const category = await Category.findOne({ _id: categoryId });
+        const newItem = {
+          title,
+          price,
+          city,
+          categoryId: category._id,
+          description: about,
+        };
+        const item = await Item.create(newItem);
+        category.itemId.push({ _id: item._id });
+        await category.save();
+        for (let i = 0; i < req.files.length; i++) {
+          const imageSave = await Image.create({ imageUrl: `images/${req.files[i].filename}` });
+          item.imageId.push({ _id: imageSave._id });
+          await item.save();
+        }
+      }
+      generateSuccessMessage(req, res, 'add', 'item');
+    } catch (error) {
+      generateErrorMessage(req, res, error, 'item');
+    }
+  },
+
+  async showImageItem(req, res) {
+    try {
+      const { id } = req.params;
+      const item = await Item.findOne({ _id: id })
+        .populate({ path: 'imageId', select: 'id imageUrl' });
+      const alert = setAlert(req);
+      res.render('pages/admin/item', {
+        title: 'Staycation | Item',
+        item,
+        alert,
+        action: 'show image',
+      });
+    } catch (error) {
+      generateErrorMessage(req, res, error, 'item');
+    }
+  },
+
+  async showEditItem(req, res) {
+    try {
+      const { id } = req.params;
+      const item = await Item.findOne({ _id: id })
+        .populate({ path: 'imageId', select: 'id imageUrl' })
+        .populate({ path: 'categoryId', select: 'id name' });
+      const category = await Category.find();
+      const alert = setAlert(req);
+      res.render('pages/admin/item', {
+        title: 'Staycation | Item',
+        item,
+        category,
+        alert,
+        action: 'edit',
+      });
+    } catch (error) {
+      generateErrorMessage(req, res, error, 'item');
+    }
+  },
+
+  async editItem(req, res) {
+    try {
+      const { id } = req.params;
+      const {
+        title, price, city, categoryId, about,
+      } = req.body;
+      const item = await Item.findOne({ _id: id })
+        .populate({ path: 'imageId', select: 'id imageUrl' })
+        .populate({ path: 'categoryId', select: 'id name' });
+      if (req.files.length > 0) {
+        for (let i = 0; i < item.imageId.length; i++) {
+          const imageUpdate = await Image.findOne({ _id: item.imageId[i]._id });
+          await fs.unlink(path.join(`public/${imageUpdate.imageUrl}`));
+          imageUpdate.imageUrl = `images/${req.files[i].filename}`;
+          await imageUpdate.save();
+        }
+      }
+      item.title = title;
+      item.price = price;
+      item.city = city;
+      item.categoryId = categoryId;
+      item.description = about;
+      await item.save();
+      generateSuccessMessage(req, res, 'update', 'item');
+    } catch (error) {
+      generateErrorMessage(req, res, error, 'item');
+    }
+  },
+
+  async deleteItem(req, res) {
+    try {
+      const { id } = req.params;
+      const item = await Item.findOne({ _id: id }).populate('imageId');
+      for (let i = 0; i < item.imageId.length; i++) {
+        Image.findOne({ _id: item.imageId[i]._id }).then((image) => {
+          fs.unlink(path.join(`public/${image.imageUrl}`));
+          image.remove();
+        }).catch((error) => {
+          generateErrorMessage(req, res, error, 'item');
+        });
+      }
+      await item.remove();
+      generateSuccessMessage(req, res, 'delete', 'item');
+    } catch (error) {
+      generateErrorMessage(req, res, error, 'item');
+    }
   },
 
   viewBooking(req, res) {
