@@ -2,9 +2,14 @@
 import { Router } from 'express';
 import AdminController from '../controllers/admin-controller';
 import { uploadMultiple, upload } from '../middlewares/multer';
+import isLogin from '../middlewares/auth';
 
 const router = Router();
 
+router.get('/signin', AdminController.viewSignIn);
+router.post('/signin', AdminController.signIn);
+router.use(isLogin);
+router.get('/signout', AdminController.signOut);
 router.get('/dashboard', AdminController.viewDashboard);
 
 // endpoint category
@@ -40,5 +45,7 @@ router.delete('/item/detail/delete/activity/:id', AdminController.deleteActivity
 
 // endpoint booking
 router.get('/booking', AdminController.viewBooking);
+router.get('/booking/:id', AdminController.showDetailBooking);
+router.post('/booking/:id', AdminController.confirmBooking);
 
 export default router;

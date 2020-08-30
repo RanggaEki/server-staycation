@@ -1,0 +1,23 @@
+/* eslint-disable func-names */
+const { Schema, model } = require('mongoose');
+const bcrypt = require('bcryptjs');
+
+const UsersSchema = new Schema({
+  username: {
+    type: String,
+    required: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+});
+
+UsersSchema.pre('save', async function () {
+  const user = this;
+  if (user.isModified('password')) {
+    user.password = await bcrypt.hash(user.password, 8);
+  }
+});
+
+module.exports = model('Users', UsersSchema);

@@ -1,4 +1,4 @@
-import { Schema, model, ObjectId } from 'mongoose';
+const { Schema, model, ObjectId } = require('mongoose');
 
 const ItemSchema = new Schema({
   title: {
@@ -6,6 +6,10 @@ const ItemSchema = new Schema({
     required: true,
   },
   price: {
+    type: Number,
+    required: true,
+  },
+  sumBooking: {
     type: Number,
     required: true,
   },
@@ -25,6 +29,10 @@ const ItemSchema = new Schema({
     type: String,
     required: true,
   },
+  unit: {
+    type: String,
+    default: 'night',
+  },
   categoryId: {
     type: ObjectId,
     ref: 'Category',
@@ -43,4 +51,4 @@ const ItemSchema = new Schema({
   }],
 });
 
-export default model('Item', ItemSchema);
+module.exports = model('Item', ItemSchema);

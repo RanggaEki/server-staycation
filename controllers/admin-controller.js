@@ -6,12 +6,16 @@
 /* eslint-disable no-undef */
 import fs from 'fs-extra';
 import path from 'path';
+import bcrypt from 'bcryptjs';
 import Category from '../models/category-schema';
 import Bank from '../models/bank-schema';
 import Item from '../models/item-schema';
 import Image from '../models/image-schema';
 import Feature from '../models/feature-schema';
 import Activity from '../models/activity-schema';
+import Users from '../models/users-schema';
+import Booking from '../models/booking-schema';
+import Member from '../models/member-schema';
 
 const generateSuccessMessage = (req, res, endpoint, model, param = '') => {
   const message = `Success ${endpoint} ${model}`;
@@ -21,8 +25,8 @@ const generateSuccessMessage = (req, res, endpoint, model, param = '') => {
   res.redirect(`/admin/${route}`);
 };
 
-const generateErrorMessage = (req, res, error, model) => {
-  req.flash('alertMessage', `${error.message}`);
+const generateErrorMessage = (req, res, errorMessage, model) => {
+  req.flash('alertMessage', errorMessage);
   req.flash('alertStatus', 'danger');
   res.redirect(`/admin/${model}`);
 };
@@ -33,10 +37,63 @@ const setAlert = (req) => ({
 });
 
 const AdminController = {
-  viewDashboard(req, res) {
-    res.render('pages/admin/dashboard', {
-      title: 'Staycation | Dashboard',
-    });
+  async viewSignIn(req, res) {
+    try {
+      const alert = setAlert(req);
+      const userSession = req.session.user;
+      if (userSession) {
+        res.redirect('/admin/dashboard');
+      }
+      res.render('index', {
+        title: 'Staycation | Sign In',
+        alert,
+      });
+    } catch (error) {
+      generateErrorMessage(req, res, error.message, '/admin/signin');
+    }
+  },
+
+  async signIn(req, res) {
+    try {
+      const { username, password } = req.body;
+      const user = await Users.findOne({ username });
+      if (!user) {
+        generateErrorMessage(req, res, 'user not found', 'signin');
+      }
+      const isPasswordMatch = await bcrypt.compare(password, user.password);
+      if (!isPasswordMatch) {
+        generateErrorMessage(req, res, 'wrong password', 'signin');
+      }
+      req.session.user = {
+        id: user._id,
+        username: user.username,
+      };
+      res.redirect('/admin/dashboard');
+    } catch (error) {
+      generateErrorMessage(req, res, error.message, '/admin/signin');
+    }
+  },
+
+  signOut(req, res) {
+    req.session.destroy();
+    res.redirect('/admin/signin');
+  },
+
+  async viewDashboard(req, res) {
+    try {
+      const members = await Member.find();
+      const bookings = await Booking.find();
+      const items = await Item.find();
+      res.render('pages/admin/dashboard', {
+        title: 'Staycation | Dashboard',
+        user: req.session.user,
+        members,
+        bookings,
+        items,
+      });
+    } catch (error) {
+      generateErrorMessage(req, res, error.message, 'dashboard');
+    }
   },
 
   async viewCategory(req, res) {
@@ -47,9 +104,10 @@ const AdminController = {
         title: 'Staycation | Category',
         category,
         alert,
+        user: req.session.user,
       });
     } catch (error) {
-      generateErrorMessage(req, res, error, 'category');
+      generateErrorMessage(req, res, error.message, 'category');
     }
   },
 
@@ -59,7 +117,7 @@ const AdminController = {
       await Category.create({ name });
       generateSuccessMessage(req, res, 'add', 'category');
     } catch (error) {
-      generateErrorMessage(req, res, error, 'category');
+      generateErrorMessage(req, res, error.message, 'category');
     }
   },
 
@@ -71,7 +129,7 @@ const AdminController = {
       await category.save();
       generateSuccessMessage(req, res, 'update', 'category');
     } catch (error) {
-      generateErrorMessage(req, res, error, 'category');
+      generateErrorMessage(req, res, error.message, 'category');
     }
   },
 
@@ -82,7 +140,7 @@ const AdminController = {
       await category.remove();
       generateSuccessMessage(req, res, 'delete', 'category');
     } catch (error) {
-      generateErrorMessage(req, res, error, 'category');
+      generateErrorMessage(req, res, error.message, 'category');
     }
   },
 
@@ -94,9 +152,10 @@ const AdminController = {
         title: 'Staycation | Bank',
         bank,
         alert,
+        user: req.session.user,
       });
     } catch (error) {
-      generateErrorMessage(req, res, error, 'bank');
+      generateErrorMessage(req, res, error.message, 'bank');
     }
   },
 
@@ -113,7 +172,7 @@ const AdminController = {
       });
       generateSuccessMessage(req, res, 'add', 'bank');
     } catch (error) {
-      generateErrorMessage(req, res, error, 'bank');
+      generateErrorMessage(req, res, error.message, 'bank');
     }
   },
 
@@ -133,7 +192,7 @@ const AdminController = {
       await bank.save();
       generateSuccessMessage(req, res, 'update', 'bank');
     } catch (error) {
-      generateErrorMessage(req, res, error, 'bank');
+      generateErrorMessage(req, res, error.message, 'bank');
     }
   },
 
@@ -145,7 +204,7 @@ const AdminController = {
       await bank.remove();
       generateSuccessMessage(req, res, 'delete', 'bank');
     } catch (error) {
-      generateErrorMessage(req, res, error, 'bank');
+      generateErrorMessage(req, res, error.message, 'bank');
     }
   },
 
@@ -162,9 +221,10 @@ const AdminController = {
         category,
         alert,
         action: 'view',
+        user: req.session.user,
       });
     } catch (error) {
-      generateErrorMessage(req, res, error, 'item');
+      generateErrorMessage(req, res, error.message, 'item');
     }
   },
 
@@ -193,7 +253,7 @@ const AdminController = {
       }
       generateSuccessMessage(req, res, 'add', 'item');
     } catch (error) {
-      generateErrorMessage(req, res, error, 'item');
+      generateErrorMessage(req, res, error.message, 'item');
     }
   },
 
@@ -208,9 +268,10 @@ const AdminController = {
         item,
         alert,
         action: 'show image',
+        user: req.session.user,
       });
     } catch (error) {
-      generateErrorMessage(req, res, error, 'item');
+      generateErrorMessage(req, res, error.message, 'item');
     }
   },
 
@@ -228,9 +289,10 @@ const AdminController = {
         category,
         alert,
         action: 'edit',
+        user: req.session.user,
       });
     } catch (error) {
-      generateErrorMessage(req, res, error, 'item');
+      generateErrorMessage(req, res, error.message, 'item');
     }
   },
 
@@ -259,7 +321,7 @@ const AdminController = {
       await item.save();
       generateSuccessMessage(req, res, 'update', 'item');
     } catch (error) {
-      generateErrorMessage(req, res, error, 'item');
+      generateErrorMessage(req, res, error.message, 'item');
     }
   },
 
@@ -272,13 +334,13 @@ const AdminController = {
           fs.unlink(path.join(`public/${image.imageUrl}`));
           image.remove();
         }).catch((error) => {
-          generateErrorMessage(req, res, error, 'item');
+          generateErrorMessage(req, res, error.message, 'item');
         });
       }
       await item.remove();
       generateSuccessMessage(req, res, 'delete', 'item');
     } catch (error) {
-      generateErrorMessage(req, res, error, 'item');
+      generateErrorMessage(req, res, error.message, 'item');
     }
   },
 
@@ -294,9 +356,10 @@ const AdminController = {
         features,
         activities,
         alert,
+        user: req.session.user,
       });
     } catch (error) {
-      generateErrorMessage(req, res, error, `item/detail/${itemId}`);
+      generateErrorMessage(req, res, error.message, `item/detail/${itemId}`);
     }
   },
 
@@ -314,7 +377,7 @@ const AdminController = {
       await item.save();
       generateSuccessMessage(req, res, 'add', 'feature', `item/detail/${itemId}`);
     } catch (error) {
-      generateErrorMessage(req, res, error, `item/detail/${itemId}`);
+      generateErrorMessage(req, res, error.message, `item/detail/${itemId}`);
     }
   },
 
@@ -333,7 +396,7 @@ const AdminController = {
       await feature.save();
       generateSuccessMessage(req, res, 'update', 'feature', `item/detail/${itemId}`);
     } catch (error) {
-      generateErrorMessage(req, res, error, `item/detail/${itemId}`);
+      generateErrorMessage(req, res, error.message, `item/detail/${itemId}`);
     }
   },
 
@@ -350,7 +413,7 @@ const AdminController = {
       await feature.remove();
       generateSuccessMessage(req, res, 'delete', 'feature', `item/detail/${itemId}`);
     } catch (error) {
-      generateErrorMessage(req, res, error, `item/detail/${itemId}`);
+      generateErrorMessage(req, res, error.message, `item/detail/${itemId}`);
     }
   },
 
@@ -368,7 +431,7 @@ const AdminController = {
       await item.save();
       generateSuccessMessage(req, res, 'add', 'activity', `item/detail/${itemId}`);
     } catch (error) {
-      generateErrorMessage(req, res, error, `item/detail/${itemId}`);
+      generateErrorMessage(req, res, error.message, `item/detail/${itemId}`);
     }
   },
 
@@ -387,7 +450,7 @@ const AdminController = {
       await activity.save();
       generateSuccessMessage(req, res, 'update', 'activity', `item/detail/${itemId}`);
     } catch (error) {
-      generateErrorMessage(req, res, error, `item/detail/${itemId}`);
+      generateErrorMessage(req, res, error.message, `item/detail/${itemId}`);
     }
   },
 
@@ -404,14 +467,54 @@ const AdminController = {
       await activity.remove();
       generateSuccessMessage(req, res, 'delete', 'activity', `item/detail/${itemId}`);
     } catch (error) {
-      generateErrorMessage(req, res, error, `item/detail/${itemId}`);
+      generateErrorMessage(req, res, error.message, `item/detail/${itemId}`);
     }
   },
 
-  viewBooking(req, res) {
-    res.render('pages/admin/booking', {
-      title: 'Staycation | Booking',
-    });
+  async viewBooking(req, res) {
+    try {
+      const bookings = await Booking.find()
+        .populate('memberId')
+        .populate('bankId');
+      const alert = setAlert(req);
+      res.render('pages/admin/booking', {
+        title: 'Staycation | Booking',
+        bookings,
+        user: req.session.user,
+        alert,
+      });
+    } catch (error) {
+      generateErrorMessage(req, res, error.message, 'booking');
+    }
+  },
+
+  async showDetailBooking(req, res) {
+    const { id } = req.params;
+    try {
+      const booking = await Booking.findOne({ _id: id })
+        .populate('memberId')
+        .populate('bankId');
+      res.render('pages/admin/booking-detail', {
+        title: 'Staycation | Booking Detail',
+        booking,
+        user: req.session.user,
+      });
+    } catch (error) {
+      generateErrorMessage(req, res, error.message, 'booking');
+    }
+  },
+
+  async confirmBooking(req, res) {
+    const { id } = req.params;
+    try {
+      const { confirmation } = req.body;
+      const booking = await Booking.findOne({ _id: id });
+      booking.payments.status = confirmation;
+      await booking.save();
+      generateSuccessMessage(req, res, confirmation, 'booking');
+    } catch (error) {
+      generateErrorMessage(req, res, error.message, `admin/booking/${id}`);
+    }
   },
 };
 

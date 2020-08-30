@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+const { Schema, model } = require('mongoose');
 
 const ImageSchema = new Schema({
   imageUrl: {
@@ -7,4 +7,4 @@ const ImageSchema = new Schema({
   },
 });
 
-export default model('Image', ImageSchema);
+module.exports = model('Image', ImageSchema);

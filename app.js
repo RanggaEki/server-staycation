@@ -14,7 +14,7 @@ import usersRouter from './routes/users';
 // routes admin
 import adminRouter from './routes/admin';
 
-const URI = 'mongodb://localhost:27017/db_staycation';
+const URI = 'mongodb://127.0.0.1:27017/db_staycation';
 const OPTIONS = {
   useNewUrlParser: true,
   useUnifiedTopology: true,

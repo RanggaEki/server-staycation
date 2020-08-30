@@ -1,4 +1,4 @@
-import { Schema, model, ObjectId } from 'mongoose';
+const { Schema, model, ObjectId } = require('mongoose');
 
 const ActivitySchema = new Schema({
   name: {
@@ -23,4 +23,4 @@ const ActivitySchema = new Schema({
   },
 });
 
-export default model('Activity', ActivitySchema);
+module.exports = model('Activity', ActivitySchema);

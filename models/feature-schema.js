@@ -1,4 +1,4 @@
-import { Schema, model, ObjectId } from 'mongoose';
+const { Schema, model, ObjectId } = require('mongoose');
 
 const FeatureSchema = new Schema({
   name: {
@@ -19,4 +19,4 @@ const FeatureSchema = new Schema({
   },
 });
 
-export default model('Feature', FeatureSchema);
+module.exports = model('Feature', FeatureSchema);
