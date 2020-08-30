@@ -5,7 +5,7 @@ const FeatureSchema = new Schema({
     type: String,
     required: true,
   },
-  type: {
+  quantity: {
     type: String,
     required: true,
   },

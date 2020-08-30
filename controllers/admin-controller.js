@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-shadow */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
@@ -9,12 +10,15 @@ import Category from '../models/category-schema';
 import Bank from '../models/bank-schema';
 import Item from '../models/item-schema';
 import Image from '../models/image-schema';
+import Feature from '../models/feature-schema';
+import Activity from '../models/activity-schema';
 
-const generateSuccessMessage = (req, res, endpoint, model) => {
+const generateSuccessMessage = (req, res, endpoint, model, param = '') => {
   const message = `Success ${endpoint} ${model}`;
   req.flash('alertMessage', message);
   req.flash('alertStatus', 'success');
-  res.redirect(`/admin/${model}`);
+  const route = param === '' ? model : param;
+  res.redirect(`/admin/${route}`);
 };
 
 const generateErrorMessage = (req, res, error, model) => {
@@ -275,6 +279,132 @@ const AdminController = {
       generateSuccessMessage(req, res, 'delete', 'item');
     } catch (error) {
       generateErrorMessage(req, res, error, 'item');
+    }
+  },
+
+  async viewDetailItem(req, res) {
+    const { itemId } = req.params;
+    try {
+      const alert = setAlert(req);
+      const features = await Feature.find({ itemId });
+      const activities = await Activity.find({ itemId });
+      res.render('pages/admin/item-detail', {
+        title: 'Staycation | Detail Item',
+        itemId,
+        features,
+        activities,
+        alert,
+      });
+    } catch (error) {
+      generateErrorMessage(req, res, error, `item/detail/${itemId}`);
+    }
+  },
+
+  async addFeature(req, res) {
+    const { name, quantity, itemId } = req.body;
+    try {
+      const feature = await Feature.create({
+        name,
+        quantity,
+        imageUrl: `images/${req.file.filename}`,
+        itemId,
+      });
+      const item = await Item.findOne({ _id: itemId });
+      item.featureId.push({ _id: feature._id });
+      await item.save();
+      generateSuccessMessage(req, res, 'add', 'feature', `item/detail/${itemId}`);
+    } catch (error) {
+      generateErrorMessage(req, res, error, `item/detail/${itemId}`);
+    }
+  },
+
+  async editFeature(req, res) {
+    const {
+      id, name, quantity, itemId,
+    } = req.body;
+    try {
+      const feature = await Feature.findOne({ _id: id });
+      feature.name = name;
+      feature.quantity = quantity;
+      if (req.file !== undefined) {
+        await fs.unlink(path.join(`public/${feature.imageUrl}`));
+        feature.imageUrl = `images/${req.file.filename}`;
+      }
+      await feature.save();
+      generateSuccessMessage(req, res, 'update', 'feature', `item/detail/${itemId}`);
+    } catch (error) {
+      generateErrorMessage(req, res, error, `item/detail/${itemId}`);
+    }
+  },
+
+  async deleteFeature(req, res) {
+    const { itemId } = req.body;
+    try {
+      const { id } = req.params;
+      const feature = await Feature.findOne({ _id: id });
+      const item = await Item.findOne({ _id: itemId });
+      const filteredFeature = item.featureId.filter((id) => id.toString() !== feature._id.toString());
+      item.featureId = filteredFeature;
+      await item.save();
+      await fs.unlink(path.join(`public/${feature.imageUrl}`));
+      await feature.remove();
+      generateSuccessMessage(req, res, 'delete', 'feature', `item/detail/${itemId}`);
+    } catch (error) {
+      generateErrorMessage(req, res, error, `item/detail/${itemId}`);
+    }
+  },
+
+  async addActivity(req, res) {
+    const { name, type, itemId } = req.body;
+    try {
+      const activity = await Activity.create({
+        name,
+        type,
+        imageUrl: `images/${req.file.filename}`,
+        itemId,
+      });
+      const item = await Item.findOne({ _id: itemId });
+      item.activityId.push({ _id: activity._id });
+      await item.save();
+      generateSuccessMessage(req, res, 'add', 'activity', `item/detail/${itemId}`);
+    } catch (error) {
+      generateErrorMessage(req, res, error, `item/detail/${itemId}`);
+    }
+  },
+
+  async editActivity(req, res) {
+    const {
+      id, name, type, itemId,
+    } = req.body;
+    try {
+      const activity = await Activity.findOne({ _id: id });
+      activity.name = name;
+      activity.type = type;
+      if (req.file !== undefined) {
+        await fs.unlink(path.join(`public/${activity.imageUrl}`));
+        activity.imageUrl = `images/${req.file.filename}`;
+      }
+      await activity.save();
+      generateSuccessMessage(req, res, 'update', 'activity', `item/detail/${itemId}`);
+    } catch (error) {
+      generateErrorMessage(req, res, error, `item/detail/${itemId}`);
+    }
+  },
+
+  async deleteActivity(req, res) {
+    const { itemId } = req.body;
+    try {
+      const { id } = req.params;
+      const activity = await Activity.findOne({ _id: id });
+      const item = await Item.findOne({ _id: itemId });
+      const filteredActivity = item.activityId.filter((id) => id.toString() !== activity._id.toString());
+      item.activityId = filteredActivity;
+      await item.save();
+      await fs.unlink(path.join(`public/${activity.imageUrl}`));
+      await activity.remove();
+      generateSuccessMessage(req, res, 'delete', 'activity', `item/detail/${itemId}`);
+    } catch (error) {
+      generateErrorMessage(req, res, error, `item/detail/${itemId}`);
     }
   },
 
