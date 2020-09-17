@@ -1,3 +1,5 @@
+/* eslint-disable object-curly-newline */
+/* eslint-disable comma-dangle */
 /* eslint-disable max-len */
 /* eslint-disable no-shadow */
 /* eslint-disable no-plusplus */
@@ -161,9 +163,7 @@ const AdminController = {
 
   async addBank(req, res) {
     try {
-      const {
-        bankName, accountNumber, name,
-      } = req.body;
+      const { bankName, accountNumber, name } = req.body;
       await Bank.create({
         bankName,
         accountNumber,
@@ -178,9 +178,7 @@ const AdminController = {
 
   async editBank(req, res) {
     try {
-      const {
-        id, bankName, accountNumber, name,
-      } = req.body;
+      const { id, bankName, accountNumber, name } = req.body;
       const bank = await Bank.findOne({ _id: id });
       bank.bankName = bankName;
       bank.accountNumber = accountNumber;
@@ -230,9 +228,7 @@ const AdminController = {
 
   async addItem(req, res) {
     try {
-      const {
-        title, price, city, categoryId, about,
-      } = req.body;
+      const { title, price, city, categoryId, about } = req.body;
       if (req.files.length > 0) {
         const category = await Category.findOne({ _id: categoryId });
         const newItem = {
@@ -246,7 +242,9 @@ const AdminController = {
         category.itemId.push({ _id: item._id });
         await category.save();
         for (let i = 0; i < req.files.length; i++) {
-          const imageSave = await Image.create({ imageUrl: `images/${req.files[i].filename}` });
+          const imageSave = await Image.create({
+            imageUrl: `images/${req.files[i].filename}`,
+          });
           item.imageId.push({ _id: imageSave._id });
           await item.save();
         }
@@ -260,8 +258,10 @@ const AdminController = {
   async showImageItem(req, res) {
     try {
       const { id } = req.params;
-      const item = await Item.findOne({ _id: id })
-        .populate({ path: 'imageId', select: 'id imageUrl' });
+      const item = await Item.findOne({ _id: id }).populate({
+        path: 'imageId',
+        select: 'id imageUrl',
+      });
       const alert = setAlert(req);
       res.render('pages/admin/item', {
         title: 'Staycation | Item',
@@ -299,9 +299,7 @@ const AdminController = {
   async editItem(req, res) {
     try {
       const { id } = req.params;
-      const {
-        title, price, city, categoryId, about,
-      } = req.body;
+      const { title, price, city, categoryId, about } = req.body;
       const item = await Item.findOne({ _id: id })
         .populate({ path: 'imageId', select: 'id imageUrl' })
         .populate({ path: 'categoryId', select: 'id name' });
@@ -330,12 +328,14 @@ const AdminController = {
       const { id } = req.params;
       const item = await Item.findOne({ _id: id }).populate('imageId');
       for (let i = 0; i < item.imageId.length; i++) {
-        Image.findOne({ _id: item.imageId[i]._id }).then((image) => {
-          fs.unlink(path.join(`public/${image.imageUrl}`));
-          image.remove();
-        }).catch((error) => {
-          generateErrorMessage(req, res, error.message, 'item');
-        });
+        Image.findOne({ _id: item.imageId[i]._id })
+          .then((image) => {
+            fs.unlink(path.join(`public/${image.imageUrl}`));
+            image.remove();
+          })
+          .catch((error) => {
+            generateErrorMessage(req, res, error.message, 'item');
+          });
       }
       await item.remove();
       generateSuccessMessage(req, res, 'delete', 'item');
@@ -375,16 +375,20 @@ const AdminController = {
       const item = await Item.findOne({ _id: itemId });
       item.featureId.push({ _id: feature._id });
       await item.save();
-      generateSuccessMessage(req, res, 'add', 'feature', `item/detail/${itemId}`);
+      generateSuccessMessage(
+        req,
+        res,
+        'add',
+        'feature',
+        `item/detail/${itemId}`
+      );
     } catch (error) {
       generateErrorMessage(req, res, error.message, `item/detail/${itemId}`);
     }
   },
 
   async editFeature(req, res) {
-    const {
-      id, name, quantity, itemId,
-    } = req.body;
+    const { id, name, quantity, itemId } = req.body;
     try {
       const feature = await Feature.findOne({ _id: id });
       feature.name = name;
@@ -394,7 +398,13 @@ const AdminController = {
         feature.imageUrl = `images/${req.file.filename}`;
       }
       await feature.save();
-      generateSuccessMessage(req, res, 'update', 'feature', `item/detail/${itemId}`);
+      generateSuccessMessage(
+        req,
+        res,
+        'update',
+        'feature',
+        `item/detail/${itemId}`
+      );
     } catch (error) {
       generateErrorMessage(req, res, error.message, `item/detail/${itemId}`);
     }
@@ -406,12 +416,20 @@ const AdminController = {
       const { id } = req.params;
       const feature = await Feature.findOne({ _id: id });
       const item = await Item.findOne({ _id: itemId });
-      const filteredFeature = item.featureId.filter((id) => id.toString() !== feature._id.toString());
+      const filteredFeature = item.featureId.filter(
+        (id) => id.toString() !== feature._id.toString()
+      );
       item.featureId = filteredFeature;
       await item.save();
       await fs.unlink(path.join(`public/${feature.imageUrl}`));
       await feature.remove();
-      generateSuccessMessage(req, res, 'delete', 'feature', `item/detail/${itemId}`);
+      generateSuccessMessage(
+        req,
+        res,
+        'delete',
+        'feature',
+        `item/detail/${itemId}`
+      );
     } catch (error) {
       generateErrorMessage(req, res, error.message, `item/detail/${itemId}`);
     }
@@ -429,16 +447,20 @@ const AdminController = {
       const item = await Item.findOne({ _id: itemId });
       item.activityId.push({ _id: activity._id });
       await item.save();
-      generateSuccessMessage(req, res, 'add', 'activity', `item/detail/${itemId}`);
+      generateSuccessMessage(
+        req,
+        res,
+        'add',
+        'activity',
+        `item/detail/${itemId}`
+      );
     } catch (error) {
       generateErrorMessage(req, res, error.message, `item/detail/${itemId}`);
     }
   },
 
   async editActivity(req, res) {
-    const {
-      id, name, type, itemId,
-    } = req.body;
+    const { id, name, type, itemId } = req.body;
     try {
       const activity = await Activity.findOne({ _id: id });
       activity.name = name;
@@ -448,7 +470,13 @@ const AdminController = {
         activity.imageUrl = `images/${req.file.filename}`;
       }
       await activity.save();
-      generateSuccessMessage(req, res, 'update', 'activity', `item/detail/${itemId}`);
+      generateSuccessMessage(
+        req,
+        res,
+        'update',
+        'activity',
+        `item/detail/${itemId}`
+      );
     } catch (error) {
       generateErrorMessage(req, res, error.message, `item/detail/${itemId}`);
     }
@@ -460,12 +488,20 @@ const AdminController = {
       const { id } = req.params;
       const activity = await Activity.findOne({ _id: id });
       const item = await Item.findOne({ _id: itemId });
-      const filteredActivity = item.activityId.filter((id) => id.toString() !== activity._id.toString());
+      const filteredActivity = item.activityId.filter(
+        (id) => id.toString() !== activity._id.toString()
+      );
       item.activityId = filteredActivity;
       await item.save();
       await fs.unlink(path.join(`public/${activity.imageUrl}`));
       await activity.remove();
-      generateSuccessMessage(req, res, 'delete', 'activity', `item/detail/${itemId}`);
+      generateSuccessMessage(
+        req,
+        res,
+        'delete',
+        'activity',
+        `item/detail/${itemId}`
+      );
     } catch (error) {
       generateErrorMessage(req, res, error.message, `item/detail/${itemId}`);
     }

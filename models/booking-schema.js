@@ -55,7 +55,7 @@ const BookingSchema = new Schema({
     },
     status: {
       type: String,
-      required: true,
+      default: 'On Process',
     },
     accountHolder: {
       type: String,
