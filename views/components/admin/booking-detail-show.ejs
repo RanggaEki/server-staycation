@@ -5,12 +5,8 @@
   <div class="card-body">
     <div class="row">
       <div class="col-md-4">
-        <img
-          src="http://localhost:3000/<%= booking.payments.proofPayment %>"
-          alt="proof payment"
-          width="100%"
-          cellspacing="0"
-        >
+        <img src="https://server-staycation-clone.herokuapp.com/<%= booking.payments.proofPayment %>"
+          alt="proof payment" width="100%" cellspacing="0">
       </div>
       <div class="col-md-8">
         <div class="table-responsive">
@@ -36,25 +32,25 @@
         <div class="container">
           <div class="row">
             <% if(booking.payments.status == 'On Process'){ %>
-              <form action="/admin/booking/<%= booking._id %>" method="POST">
-                <input type="hidden" value="Accepted" name="confirmation">
-                <button class="btn btn-success btn-sm">
-                  <i class="fas fa-check"></i>
-                  Accept
-                </button>
-              </form>
-              <form action="/admin/booking/<%= booking._id %>" method="POST" class="ml-2">
-                <input type="hidden" value="Rejected" name="confirmation">
-                <button class="btn btn-danger btn-sm">
-                  <i class="fas fa-times"></i>
-                  Reject
-                </button>
-              </form>
-              <% } else { %>
-                <h1 class="h5" style="color: red">Booking already confirmed</h1>
-              <% } %>
-            </div>
+            <form action="/admin/booking/<%= booking._id %>" method="POST">
+              <input type="hidden" value="Accepted" name="confirmation">
+              <button class="btn btn-success btn-sm">
+                <i class="fas fa-check"></i>
+                Accept
+              </button>
+            </form>
+            <form action="/admin/booking/<%= booking._id %>" method="POST" class="ml-2">
+              <input type="hidden" value="Rejected" name="confirmation">
+              <button class="btn btn-danger btn-sm">
+                <i class="fas fa-times"></i>
+                Reject
+              </button>
+            </form>
+            <% } else { %>
+            <h1 class="h5" style="color: red">Booking already confirmed</h1>
+            <% } %>
           </div>
+        </div>
       </div>
     </div>
   </div>

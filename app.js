@@ -1,3 +1,4 @@
+/* eslint-disable operator-linebreak */
 /* eslint-disable comma-dangle */
 import createError from 'http-errors';
 import express, { json, urlencoded } from 'express';
@@ -17,7 +18,8 @@ import adminRouter from './routes/admin';
 // routes api
 import apiRouter from './routes/api';
 
-const URI = 'mongodb://127.0.0.1:27017/db_staycation';
+const URI =
+  'mongodb+srv://ranggasyahrial:BWAMERN@cluster0.sikrw.mongodb.net/db_staycation?retryWrites=true&w=majority';
 const OPTIONS = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
