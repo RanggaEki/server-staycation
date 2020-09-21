@@ -57,4 +57,4 @@ const checkFileType = (file, cb) => {
   return cb('Error: Images Only !!!');
 };
 
-module.exports = { uploadMultiple, upload };
+export { upload, uploadMultiple };

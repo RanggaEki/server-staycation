@@ -1,7 +1,7 @@
-/* eslint-disable import/named */
+/* eslint-disable comma-dangle */
 import { Router } from 'express';
 import AdminController from '../controllers/admin-controller';
-import { uploadMultiple, upload } from '../middlewares/multer';
+import { upload, uploadMultiple } from '../middlewares/multer';
 import isLogin from '../middlewares/auth';
 
 const router = Router();
@@ -41,7 +41,10 @@ router.delete('/item/detail/delete/feature/:id', AdminController.deleteFeature);
 // activity
 router.post('/item/detail/add/activity', upload, AdminController.addActivity);
 router.put('/item/detail/edit/activity', upload, AdminController.editActivity);
-router.delete('/item/detail/delete/activity/:id', AdminController.deleteActivity);
+router.delete(
+  '/item/detail/delete/activity/:id',
+  AdminController.deleteActivity
+);
 
 // endpoint booking
 router.get('/booking', AdminController.viewBooking);
