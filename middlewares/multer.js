@@ -1,8 +1,10 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-use-before-define */
-import multer, { diskStorage } from 'multer';
-import { extname } from 'path';
-import { existsSync, mkdirSync } from 'fs';
+const multer = require('multer');
+
+const { diskStorage } = multer;
+const { extname } = require('path');
+const { existsSync, mkdirSync } = require('fs');
 // import uuid from "uuid/v4";
 
 const storageMultiple = diskStorage({
@@ -57,4 +59,4 @@ const checkFileType = (file, cb) => {
   return cb('Error: Images Only !!!');
 };
 
-export { upload, uploadMultiple };
+module.exports = { upload, uploadMultiple };

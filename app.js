@@ -1,22 +1,24 @@
 /* eslint-disable operator-linebreak */
 /* eslint-disable comma-dangle */
-import createError from 'http-errors';
-import express, { json, urlencoded } from 'express';
-import { join } from 'path';
-import cookieParser from 'cookie-parser';
-import logger from 'morgan';
-// import mongoose
-import mongoose from 'mongoose';
-import methodOverride from 'method-override';
-import session from 'express-session';
-import flash from 'connect-flash';
+const createError = require('http-errors');
+const express = require('express');
 
-import indexRouter from './routes/index';
-import usersRouter from './routes/users';
+const { json, urlencoded } = express;
+const { join } = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+// import mongoose
+const mongoose = require('mongoose');
+const methodOverride = require('method-override');
+const session = require('express-session');
+const flash = require('connect-flash');
+
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
 // routes admin
-import adminRouter from './routes/admin';
+const adminRouter = require('./routes/admin');
 // routes api
-import apiRouter from './routes/api';
+const apiRouter = require('./routes/api');
 
 const URI =
   'mongodb+srv://ranggasyahrial:BWAMERN@cluster0.sikrw.mongodb.net/db_staycation?retryWrites=true&w=majority';
@@ -77,4 +79,4 @@ app.use((err, req, res) => {
   res.render('error');
 });
 
-export default app;
+module.exports = app;

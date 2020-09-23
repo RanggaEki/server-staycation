@@ -1,1 +1,1 @@
-web: nodemon ./bin/www --exec babel-node --presets babel-preset-env
+web: node ./bin/www

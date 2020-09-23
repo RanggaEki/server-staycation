@@ -4,11 +4,11 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-await-in-loop */
-import Activity from '../models/activity-schema';
-import Booking from '../models/booking-schema';
-import Category from '../models/category-schema';
-import Member from '../models/member-schema';
-import Item from '../models/item-schema';
+const Activity = require('../models/activity-schema');
+const Booking = require('../models/booking-schema');
+const Category = require('../models/category-schema');
+const Member = require('../models/member-schema');
+const Item = require('../models/item-schema');
 
 const ApiController = {
   async landingPage(req, res) {
@@ -188,4 +188,4 @@ const ApiController = {
   },
 };
 
-export default ApiController;
+module.exports = ApiController;

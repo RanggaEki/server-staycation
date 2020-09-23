@@ -1,8 +1,8 @@
 /* eslint-disable comma-dangle */
-import { Router } from 'express';
-import AdminController from '../controllers/admin-controller';
-import { upload, uploadMultiple } from '../middlewares/multer';
-import isLogin from '../middlewares/auth';
+const { Router } = require('express');
+const AdminController = require('../controllers/admin-controller');
+const { upload, uploadMultiple } = require('../middlewares/multer');
+const isLogin = require('../middlewares/auth');
 
 const router = Router();
 
@@ -51,4 +51,4 @@ router.get('/booking', AdminController.viewBooking);
 router.get('/booking/:id', AdminController.showDetailBooking);
 router.post('/booking/:id', AdminController.confirmBooking);
 
-export default router;
+module.exports = router;

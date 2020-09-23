@@ -8,4 +8,4 @@ const isLogin = (req, res, next) => {
   next();
 };
 
-export default isLogin;
+module.exports = isLogin;

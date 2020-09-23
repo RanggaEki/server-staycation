@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "nodemon ./bin/www --exec babel-node --presets babel-preset-env",
-    "start-dev": "nodemon ./bin/www",
+    "dev": "node ./bin/www",
     "test": "mocha --require esm --exit"
   },
   "dependencies": {

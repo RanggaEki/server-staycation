@@ -6,18 +6,18 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-undef */
-import fs from 'fs-extra';
-import path from 'path';
-import bcrypt from 'bcryptjs';
-import Category from '../models/category-schema';
-import Bank from '../models/bank-schema';
-import Item from '../models/item-schema';
-import Image from '../models/image-schema';
-import Feature from '../models/feature-schema';
-import Activity from '../models/activity-schema';
-import Users from '../models/users-schema';
-import Booking from '../models/booking-schema';
-import Member from '../models/member-schema';
+const fs = require('fs-extra');
+const path = require('path');
+const bcrypt = require('bcryptjs');
+const Category = require('../models/category-schema');
+const Bank = require('../models/bank-schema');
+const Item = require('../models/item-schema');
+const Image = require('../models/image-schema');
+const Feature = require('../models/feature-schema');
+const Activity = require('../models/activity-schema');
+const Users = require('../models/users-schema');
+const Booking = require('../models/booking-schema');
+const Member = require('../models/member-schema');
 
 const generateSuccessMessage = (req, res, endpoint, model, param = '') => {
   const message = `Success ${endpoint} ${model}`;
@@ -554,4 +554,4 @@ const AdminController = {
   },
 };
 
-export default AdminController;
+module.exports = AdminController;
