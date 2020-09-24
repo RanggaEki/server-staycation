@@ -56,6 +56,16 @@ app.use(
   express.static(join(__dirname, 'node_modules/startbootstrap-sb-admin-2'))
 );
 
+app.use((res, req, next) => {
+  req.setHeader('Access-Control-Allow-Origin', '*');
+  req.setHeader(
+    'Access-Control-Allow-Methods',
+    'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+  );
+  req.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 // admin
